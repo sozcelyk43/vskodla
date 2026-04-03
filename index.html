@@ -3933,6 +3933,8 @@
     let vsMatchActive = false;
     let vsMyReady = false;  // I pressed Run
     let vsOppReady = false;  // Opp pressed Run
+    let vsMyRunComplete = false; // Benim robotum durdu
+    let vsOppRunComplete = false; // Rakibin robotu durdu
     let vsTimerInterval = null;
     let vsTimerStart = 0;
     let vsOpName = ''; let vsOpAvatar = '';
@@ -4017,8 +4019,10 @@
           break;
         case 'MY_SEQ':
           vsOppFinalSeq = msg.seq || [];
+          vsOppRunComplete = true; // Rakip bitti
           // Eğer sonuç ekranı açıksa history'yi güncelle
           const histEl = document.getElementById('vs-res-history');
+          if (typeof checkDraw === "function") checkDraw(); // Beraberlik kontrolü
           if (histEl && histEl.innerHTML.includes('bekleniyor')) {
             const oppSeqStr = vsOppFinalSeq.map(c => VS_ICONS[c] || c).join(' ');
             histEl.innerHTML = histEl.innerHTML.replace(
@@ -4042,7 +4046,9 @@
       vsMyStars = 0; vsOpStars = 0;
       vsOpProg = 0;
       vsRunning = false; vsMatchDone = false; vsMatchActive = false;
-      vsMyReady = false; vsOppReady = false;
+      vsvsMyReady = false; vsOppReady = false;
+      vsMyRunComplete = false; vsOppRunComplete = false;
+      MyReady = false; vsOppReady = false;
       vsOppFinalSeq = [];
       // Update top bar
       document.getElementById('vs-me-av').textContent = myChar.emoji;
@@ -4307,6 +4313,7 @@
     function checkBothRun() {
       if (!vsMyReady || !vsOppReady) return;
       vsMyReady = false; vsOppReady = false;
+      vsMyRunComplete = false; vsOppRunComplete = false;
       executeProgram();
     }
 
@@ -4427,39 +4434,34 @@
       if (ga) { ga.style.position = 'relative'; ga.appendChild(t); setTimeout(() => t.remove(), 1900); }
     }
 
+    function checkDraw() {
+      if (vsMyRunComplete && vsOppRunComplete && !vsMatchDone) {
+        vsMatchDone = true;
+        clearInterval(vsTimerInterval);
+        showVSResult('draw', null);
+      }
+    }
+
     function showVSResult(iWon, msg) {
-      if (iWon) launchConfetti();
+      if (iWon === true) launchConfetti();
       const elapsed = Math.floor((Date.now() - vsTimerStart) / 1000);
       const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
       const ss = String(elapsed % 60).padStart(2, '0');
       const myProg = manhattanProg(vsMyPos, vsCurrentLevel.homePos, vsCurrentLevel.robotStart);
 
-      // Emoji + title
-      document.getElementById('vs-res-emoji').textContent = iWon ? '🏆' : '😢';
-      document.getElementById('vs-res-title').textContent = iWon ? 'Kazandın! 🎉' : 'Kaybettin…';
+      // Emoji ve Başlık
+      if (iWon === 'draw') {
+        document.getElementById('vs-res-emoji').textContent = '🤝';
+        document.getElementById('vs-res-title').textContent = 'Berabere!';
+      } else {
+        document.getElementById('vs-res-emoji').textContent = iWon ? '🏆' : '😢';
+        document.getElementById('vs-res-title').textContent = iWon ? 'Kazandın! 🎉' : 'Kaybettin…';
+      }
 
-      // Sub: sonuç + progress barları
+      // Progress bar HTML (Tüm sonuçlarda ortak)
       const myBarW = myProg + '%';
       const oppBarW = vsOpProg + '%';
-      document.getElementById('vs-res-sub').innerHTML = iWon
-        ? `🏠 Eve ilk sen ulaştın! &nbsp; ⏱ <strong>${mm}:${ss}</strong> &nbsp; ⭐ <strong>${vsMyStars}</strong> yıldız
-       <div style="margin-top:10px;font-size:0.75rem;font-weight:900;">
-         <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-           <span style="color:#ff9fff;min-width:28px;text-align:right">Sen</span>
-           <div style="flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;">
-             <div style="width:${myBarW};height:100%;background:linear-gradient(90deg,#ff9fff,#cc44ff);border-radius:4px;"></div>
-           </div>
-           <span style="color:#ff9fff;">${myProg}%</span>
-         </div>
-         <div style="display:flex;align-items:center;gap:6px;">
-           <span style="color:#80e8ff;min-width:28px;text-align:right">${vsOpAvatar}</span>
-           <div style="flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;">
-             <div style="width:${oppBarW};height:100%;background:linear-gradient(90deg,#80e8ff,#0099bb);border-radius:4px;"></div>
-           </div>
-           <span style="color:#80e8ff;">${vsOpProg}%</span>
-         </div>
-       </div>`
-        : `${vsOpAvatar} <strong>${vsOpName}</strong> daha hızlıydı… &nbsp; ⏱ <strong>${mm}:${ss}</strong>
+      const progressHTML = `
        <div style="margin-top:10px;font-size:0.75rem;font-weight:900;">
          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
            <span style="color:#ff9fff;min-width:28px;text-align:right">Sen</span>
@@ -4477,7 +4479,16 @@
          </div>
        </div>`;
 
-      // Komut geçmişi
+      // Alt metin (Kim kazandı/yarım mı kaldı)
+      if (iWon === 'draw') {
+        document.getElementById('vs-res-sub').innerHTML = `Oyun yarım kaldı, kimse eve ulaşamadı! &nbsp; ⏱ <strong>${mm}:${ss}</strong>` + progressHTML;
+      } else if (iWon === true) {
+        document.getElementById('vs-res-sub').innerHTML = `🏠 Eve ilk sen ulaştın! &nbsp; ⏱ <strong>${mm}:${ss}</strong> &nbsp; ⭐ <strong>${vsMyStars}</strong> yıldız` + progressHTML;
+      } else {
+        document.getElementById('vs-res-sub').innerHTML = `${vsOpAvatar} <strong>${vsOpName}</strong> daha hızlıydı… &nbsp; ⏱ <strong>${mm}:${ss}</strong>` + progressHTML;
+      }
+
+      // Komut geçmişini ekrana basma
       const mySeqStr = vsMySeq.map(c => VS_ICONS[c] || c).join(' ');
       const oppSeqStr = vsOppFinalSeq.map(c => VS_ICONS[c] || c).join(' ');
       const histEl = document.getElementById('vs-res-history');
@@ -4487,12 +4498,16 @@
           `<strong>${vsOpAvatar} Rakibin komutları (${vsOppFinalSeq.length} adım):</strong><br>${oppSeqStr || '(bekleniyor…)'}`;
       }
 
-      document.getElementById('vs-res-box').className = 'vs-result-box ' + (iWon ? 'win' : 'lose');
-      // 5 saniye bekle — oyuncular son durumu görsün
+      // Kutu çerçevesi renk ayarlaması
+      const boxClass = iWon === true ? 'win' : (iWon === 'draw' ? '' : 'lose');
+      document.getElementById('vs-res-box').className = 'vs-result-box ' + boxClass;
+
+      // 5 Saniye oyuncuların hamlesini izlemesi için bekle
       setTimeout(() => {
         document.getElementById('vs-res-overlay').classList.remove('gone');
       }, 5000);
     }
+
 
     function vsRematch() {
       document.getElementById('vs-res-overlay').classList.add('gone');
@@ -4566,12 +4581,15 @@
         sendGame({ type: 'WIN', stars: vsMyStars, time: Date.now() - vsTimerStart, seq: vsMySeq }); document.getElementById('vs-msg').textContent = '🏠 Eve ulaştın!';
         showVSResult(true, null);
       } else if (!vsMatchDone) {
-        document.getElementById('vs-msg').textContent = '';
+        document.getElementById('vs-msg').textContent = 'Hareket bitti, hedefte değil!';
         document.getElementById('vs-run-btn').disabled = false;
         document.getElementById('vs-run-btn').textContent = '▶️ Çalıştır!';
         document.getElementById('vs-run-btn').className = 'vs-run-btn';
         vsMyReady = false; vsOppReady = false;
+
+        vsMyRunComplete = true; // Benim hamlem bitti
         sendGame({ type: 'MY_SEQ', seq: vsMySeq });
+        if (typeof checkDraw === "function") checkDraw(); // Beraberlik kontrolü
       }
       vsRunning = false;
     };
