@@ -25,22 +25,24 @@
   --shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 
-body {
+html, body {
   font-family: 'Nunito', sans-serif;
   background: radial-gradient(ellipse at 20% 20%, #1a2744 0%, #0d1b2a 60%, #060d14 100%);
-  min-height: 100vh;
+  height: 100%;
+  max-height: 100vh;
   color: var(--text);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* ──────────── SCREENS ──────────── */
-.screen { display: none; min-height: 100vh; }
+.screen { display: none; height: 100vh; max-height: 100vh; overflow: hidden; }
 .screen.active { display: flex; flex-direction: column; align-items: center; }
 
 /* ──────────── WORLD MAP SCREEN ──────────── */
 #screen-map {
-  padding: 20px 12px;
-  gap: 16px;
+  padding: 20px 12px 12px;
+  gap: 10px;
+  overflow: hidden;
 }
 
 .map-header { text-align: center; }
@@ -77,6 +79,9 @@ body {
   gap: 12px;
   width: 100%;
   max-width: 900px;
+  overflow-y: auto;
+  flex: 1;
+  padding-bottom: 8px;
 }
 
 .level-card {
@@ -262,12 +267,12 @@ body {
 }
 
 .cell {
-  width: 54px;
-  height: 54px;
+  width: clamp(38px, 7vh, 60px);
+  height: clamp(38px, 7vh, 60px);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.55rem;
+  font-size: clamp(1.1rem, 2.5vh, 1.7rem);
   position: relative;
   border: 1px solid rgba(255,255,255,0.06);
   transition: background 0.15s;
@@ -609,83 +614,163 @@ input[type=range] { flex: 1; accent-color: var(--gold); }
 
 /* ──────────── RESPONSIVE LAYOUT ──────────── */
 
-/* Default (mobile-first): single column */
+
+/* ──────────── GAME SCREEN LAYOUT ──────────── */
 #screen-game {
-  padding: 8px 10px;
-  gap: 8px;
+  padding: 0;
+  gap: 0;
   justify-content: flex-start;
-  align-items: center;
+  align-items: stretch;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+#screen-game.active {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
 }
 
-.game-topbar {
+/* TOP BAR — %10 */
+#screen-game .game-topbar {
+  flex: 0 0 9vh;
+  min-height: 52px;
+  max-height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  max-width: 1100px;
+  padding: 0 80px 0 12px; /* right padding leaves room for fixed theme toggle */
   gap: 8px;
-  flex-wrap: wrap;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1.5px solid var(--border);
+  flex-shrink: 0;
 }
 
-.game-main {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-  max-width: 1100px;
-  flex-direction: column;   /* mobile: stack */
-}
-
+/* GRID SECTION — %70 */
 .grid-section {
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  width: 100%;
+  justify-content: center;
+  gap: 5px;
+  overflow: hidden;
+  padding: 6px 10px 4px;
 }
 
-.panel {
+/* BOTTOM BAR — %20 */
+
+/* BOTTOM BAR — sabit yükseklik, taşmasın */
+.game-bottom-bar {
+  flex-shrink: 0;
+  width: 98%;
+  margin: 0 1%;
+  background: rgba(15,25,40,0.95);
+  border-top: 2px solid var(--border);
+  border-radius: 14px 14px 0 0;
+  padding: 6px 10px 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
+  gap: 5px;
+  box-sizing: border-box;
 }
 
-/* Cell sizes — mobile */
-.cell { width: 54px; height: 54px; font-size: 1.55rem; }
-.robot-sprite { font-size: 1.75rem; }
-
-/* Desktop: side by side */
-@media (min-width: 820px) {
-  #screen-game { padding: 10px 20px; gap: 10px; }
-
-  .game-main {
-    flex-direction: row;   /* desktop: side by side */
-    flex-wrap: nowrap;
-    align-items: flex-start;
-  }
-
-  .grid-section {
-    flex: 0 0 auto;
-    width: auto;
-  }
-
-  .panel {
-    flex: 0 0 270px;
-    width: 270px;
-    max-width: 270px;
-  }
-
-  .cell { width: 68px; height: 68px; font-size: 1.9rem; }
-  .robot-sprite { font-size: 2rem; }
+.gbb-row1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
-/* Small phones */
-@media (max-width: 400px) {
-  .cell { width: 46px; height: 46px; font-size: 1.3rem; }
-  .robot-sprite { font-size: 1.45rem; }
+.gbb-row2 {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
+
+.gbb-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.gbb-label {
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.gbb-div {
+  width: 1px;
+  background: var(--border);
+  align-self: stretch;
+  margin: 2px 0;
+  flex-shrink: 0;
+}
+
+.gbb-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
+  grid-template-rows: repeat(3, 36px);
+  gap: 3px;
+  flex-shrink: 0;
+}
+.gbb-dpad .cmd-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.gbb-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 100px;
+  flex-shrink: 0;
+  max-width: 150px;
+  justify-content: stretch;
+}
+.gbb-actions .run-btn    { padding: 0; flex: 1; font-size: 0.85rem; }
+.gbb-actions .sec-btn    { padding: 0; flex: 1; font-size: 0.76rem; }
+.gbb-actions .danger-btn { padding: 0; flex: 1; font-size: 0.76rem; }
+
+.gbb-legend {
+  flex: 1;
+  min-width: 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+/* Sequence inside bottom bar */
+.game-bottom-bar #sequence {
+  min-height: 28px;
+  max-height: 44px;
+  overflow: hidden;
+}
+
+/* Remove old panel/game-main styles that conflict */
+.game-main { display: none !important; }
+.panel      { display: none !important; }
+
+@media (max-width: 480px) {
+  .gbb-row1, .gbb-row2 { gap: 8px; }
+  .gbb-div { display: none; }
+  .gbb-dpad { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 40px); }
+  .gbb-dpad .cmd-btn { width: 40px; height: 40px; font-size: 1.1rem; }
+}
+
+
 
 /* OBSTACLE & PIT buttons */
 .cmd-btn.obstacle {
@@ -738,58 +823,155 @@ input[type=range] { flex: 1; accent-color: var(--gold); }
 }
 .home-card {
   flex:1; min-width:220px; max-width:260px;
-  border:2px solid; border-radius:22px; padding:28px 20px;
+  border:2px solid; border-radius:22px; padding:24px 20px;
   text-align:center; cursor:pointer;
   transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
   box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  display:flex; flex-direction:column; align-items:center;
+  height: 260px;
 }
-.home-card:hover { transform: translateY(-8px) scale(1.04); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+.home-card:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+.home-card-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.home-card-btn  { width:100%; margin-top:auto; }
 
 
 /* ──────────── AÇIK TEMA ──────────── */
 body.light {
-  --bg1: #f0f4f8;
-  --bg2: #e2eaf2;
-  --gold: #b8860b;
-  --gold2: #d4820a;
-  --accent: #0077aa;
-  --success: #007a3d;
-  --danger: #c0392b;
-  --text: #1a2a3a;
-  --subtext: #4a6070;
-  --card: rgba(0,0,0,0.05);
-  --border: rgba(0,0,0,0.12);
-  --shadow: 0 4px 20px rgba(0,0,0,0.15);
-  background: radial-gradient(ellipse at 20% 20%, #dce8f4 0%, #f0f4f8 60%, #e8f0f8 100%);
-  color: var(--text);
+  --bg1: #dce8f4;
+  --bg2: #c8dced;
+  --gold: #8a5500;
+  --gold2: #a86800;
+  --accent: #0050aa;
+  --success: #004d25;
+  --danger: #990000;
+  --text: #0a1520;
+  --subtext: #1e3a55;
+  --card: rgba(0,0,0,0.09);
+  --border: rgba(0,0,0,0.20);
+  --shadow: 0 4px 20px rgba(0,0,0,0.22);
+  background: radial-gradient(ellipse at 20% 20%, #c0d8ee 0%, #dce8f4 60%, #ccdae8 100%) !important;
+  color: var(--text) !important;
 }
-body.light .seq-empty { color: rgba(0,0,0,0.35); }
-body.light .mode-tip  { color: rgba(0,0,0,0.35); }
-body.light .cmd-btn   { border-color: rgba(0,0,0,0.18); background: rgba(0,0,0,0.05); color: #1a2a3a; }
-body.light .cmd-btn:hover { background: rgba(184,134,11,0.15); border-color: var(--gold); }
-body.light .run-btn   { box-shadow: 0 4px 16px rgba(0,140,70,0.3); }
-body.light .sec-btn   { color: var(--subtext); border-color: rgba(0,0,0,0.15); }
-body.light .danger-btn { color: #c0392b; border-color: rgba(192,57,43,0.35); background: rgba(192,57,43,0.06); }
-body.light .win-box   { background: linear-gradient(135deg,#f8f4e8,#f0ecd8); border-color: var(--gold); }
-body.light #win-overlay { background: rgba(0,0,0,0.5); }
-body.light .home-card { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
-body.light .level-card { background: rgba(0,0,0,0.04); }
-body.light .pbox      { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); }
-body.light #sequence  { background: rgba(0,0,0,0.06); }
-body.light .progress-bar-wrap { background: rgba(0,0,0,0.1); }
-body.light .score-chip { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.1); }
-body.light .mode-toggle { background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.12); }
-body.light .back-btn  { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.15); color: var(--text); }
-body.light .cmd-btn.obstacle { background: rgba(192,57,43,0.08); border-color: rgba(192,57,43,0.3); color: #c0392b; }
-body.light .cmd-btn.pit { background: rgba(80,40,160,0.08); border-color: rgba(80,40,160,0.3); color: #6030b0; }
-body.light .vs-result-box { background: rgba(240,244,248,0.96) !important; }
-body.light .vs-result-box .vs-res-title { color: var(--gold); }
-body.light .vs-res-sub, body.light #vs-res-history { color: var(--subtext); }
-body.light .vs-pbox { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); }
-body.light .vs-run-btn { box-shadow: 0 3px 14px rgba(0,140,70,0.25); }
-body.light .vs-si { color: #1a1a2e; }
-body.light .rooms-empty { color: var(--subtext); }
+/* ── AÇIK TEMA KAPSAMLI KURALLAR ── */
+body.light * { color: inherit; }
+body.light p, body.light span, body.light div, body.light label,
+body.light h1, body.light h2, body.light h3 { color: var(--text); }
+body.light .seq-empty  { color: rgba(0,0,0,0.45) !important; }
+body.light .mode-tip   { color: rgba(0,0,0,0.55) !important; }
+body.light .subtext-el { color: var(--subtext) !important; }
+/* Tüm subtext renkleri */
+body.light [style*="color:var(--subtext)"],
+body.light [style*="color: var(--subtext)"] { color: var(--subtext) !important; }
+/* Inline rgba beyaz renkleri yakala */
+body.light [style*="color:rgba(255"] { color: var(--subtext) !important; }
+body.light [style*="color: rgba(255"] { color: var(--subtext) !important; }
+/* Score chips, badges vb */
+body.light .score-chip, body.light .diff-badge { color: var(--text) !important; }
+body.light .diff-easy  { color: #004d25 !important; }
+body.light .diff-medium { color: #7a4500 !important; }
+body.light .diff-hard  { color: #880000 !important; }
+body.light .vs-vs-label { color: var(--gold) !important; }
+body.light .vs-timer-sm { color: var(--text) !important; }
+body.light .pi-name, body.light .pi-avatar { color: var(--text) !important; }
+body.light .vs-pinfo.me  { color: #550055 !important; }
+body.light .vs-pinfo.opp { color: #003366 !important; }
+body.light .map-header h1 { color: var(--gold) !important; }
+body.light .map-header p  { color: var(--subtext) !important; }
+body.light .gbb-label     { color: var(--gold) !important; }
+body.light .step-counter  { color: var(--subtext) !important; }
+body.light .mode-btn      { color: var(--subtext) !important; }
+body.light .mode-btn.active { color: white !important; }
+body.light .level-info h2  { color: var(--gold) !important; }
+body.light .vs-ctrl-label  { color: var(--gold) !important; }
+body.light .vs-ctrl-sublabel { color: rgba(0,0,0,0.5) !important; }
+body.light .vs-star-badge   { color: var(--gold) !important; }
+body.light .vs-seq-counter  { color: var(--subtext) !important; }
+body.light .vs-msg          { color: var(--subtext) !important; }
+body.light .legend-item     { color: var(--subtext) !important; }
+
+/* Buttons */
+body.light .cmd-btn    { border-color: rgba(0,0,0,0.28); background: rgba(0,0,0,0.09); color: #0a1520; }
+body.light .cmd-btn:hover { background: rgba(138,85,0,0.15); border-color: var(--gold); }
+body.light .cmd-btn.obstacle { background: rgba(153,0,0,0.09); border-color: rgba(153,0,0,0.35); color: #880000; }
+body.light .cmd-btn.pit { background: rgba(60,30,140,0.09); border-color: rgba(60,30,140,0.35); color: #3a1a90; }
+body.light .run-btn    { color: white; }
+body.light .sec-btn    { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.22); color: var(--subtext); }
+body.light .danger-btn { color: #880000; border-color: rgba(153,0,0,0.35); background: rgba(153,0,0,0.07); }
+body.light .back-btn   { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.22); color: #0a1520; }
+
+/* Panels */
+body.light .pbox       { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.18); }
+body.light .ptitle     { color: var(--gold); }
+body.light .gbb-label  { color: var(--gold); }
+body.light .score-chip { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.18); color: #0a1520; }
+body.light .mode-toggle { background: rgba(0,0,0,0.10); border-color: rgba(0,0,0,0.20); }
+body.light .mode-btn   { color: var(--subtext); }
+body.light #sequence   { background: rgba(0,0,0,0.08); }
+body.light .step-counter { color: var(--subtext); }
+body.light .game-bottom-bar { background: rgba(220,232,244,0.97); border-color: rgba(0,0,0,0.18); }
+body.light .progress-bar-wrap { background: rgba(0,0,0,0.12); }
+body.light .legend-item { color: #1e3a55; }
+
+/* Map */
+body.light .level-card { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.16); }
+body.light .level-card .level-num { color: #1e3a55; }
+body.light .level-card .level-name { color: #0a1520; }
+body.light .progress-label { color: #1e3a55; }
+body.light .page-label { color: #1e3a55; }
+body.light .page-btn   { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.18); color: #0a1520; }
+
+/* Home */
+body.light .home-card  { background: rgba(255,255,255,0.88) !important; box-shadow: 0 8px 32px rgba(0,0,0,0.16); }
+body.light .home-card .home-card-body > div { color: #1e3a55; }
+
+/* Win overlay */
+body.light #win-overlay { background: rgba(0,0,0,0.55); }
+body.light .win-box  { background: linear-gradient(135deg,#f5f0e5,#ede8d8); border-color: var(--gold); }
+body.light .win-box h2 { color: var(--gold); }
 body.light .win-box .win-stats { color: var(--subtext); }
+body.light .win-btn.secondary { background: rgba(0,0,0,0.06); color: var(--subtext); border: 1.5px solid rgba(0,0,0,0.12); }
+
+/* VS screen */
+body.light #screen-vs   { background: #c8dced !important; }
+body.light .vs-top      { background: rgba(255,255,255,0.92); border-bottom-color: rgba(0,0,0,0.15); }
+body.light .pi-name     { color: #0a1520; }
+body.light .vs-vs-label { color: #8a5500; }
+body.light .vs-timer-sm { color: #0a1520; }
+body.light .vs-prog-strip { background: rgba(0,0,0,0.09); }
+body.light .vs-ctrl     { background: rgba(220,232,244,0.97); border-top-color: rgba(0,0,0,0.15); }
+body.light .vs-ctrl-section + .vs-ctrl-section { border-left-color: rgba(0,0,0,0.14); }
+body.light .vs-ctrl-label   { color: #8a5500; }
+body.light .vs-ctrl-sublabel { color: rgba(0,0,0,0.5); }
+body.light .vs-dpad-grid .dc { background: rgba(0,0,0,0.09); border-color: rgba(0,0,0,0.22); color: #0a1520; }
+body.light .vs-specials .dc.jump  { color: #0050aa; }
+body.light .vs-specials .dc.break { color: #7a4000; }
+body.light .vs-seq      { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.14); }
+body.light .vs-seq-empty { color: rgba(0,0,0,0.4); }
+body.light .vs-seq-counter { color: #1e3a55; }
+body.light .vs-mini-btn { background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.18); color: #1e3a55; }
+body.light .vs-speed-opts .vs-speed-opt { border-color: rgba(0,0,0,0.18); color: #1e3a55; background: rgba(0,0,0,0.05); }
+body.light .vs-speed-opts .vs-speed-opt.selected { border-color: var(--gold); color: var(--gold); background: rgba(138,85,0,0.10); }
+body.light .vs-result-box { background: rgba(220,232,244,0.98) !important; }
+body.light .vs-res-title  { color: var(--gold); }
+body.light .vs-res-sub, body.light #vs-res-history { color: #1e3a55; }
+body.light .vs-msg        { color: #1e3a55; }
+
+
+/* Lobby + Char */
+body.light .lobby-wrap  { background: rgba(255,255,255,0.88); border-radius: 16px; }
+body.light .lobby-title { color: var(--gold); }
+body.light .lobby-status-bar { color: #0a1520; }
+body.light .rooms-section-title { color: #0a1520; }
+body.light .rooms-empty { color: #1e3a55; }
+body.light .name-input  { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.22); color: #0a1520; }
+body.light .name-input::placeholder { color: rgba(0,0,0,0.38); }
+body.light .char-card   { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.16); }
+body.light .char-card .char-label { color: #1e3a55; }
+body.light .cs-btn.secondary { background: rgba(0,0,0,0.08); color: #1e3a55; }
+body.light .cs-title    { color: var(--gold); }
+body.light .cs-sub      { color: #1e3a55; }
+
+/* Theme toggle — moved to right side, covered below */
 
 /* Tema toggle butonu */
 #theme-toggle {
@@ -811,12 +993,37 @@ body.light .win-box .win-stats { color: var(--subtext); }
 }
 #theme-toggle:hover { transform: scale(1.05); }
 
+/* Ana menüye dön butonu — sabit, sol üst */
+#global-home-btn {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 2000;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  display: none;
+}
+#global-home-btn:hover { background: rgba(255,255,255,0.12); transform: scale(1.05); }
+body.light #global-home-btn { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.2); color: #0a1520; }
+body.light #theme-toggle { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.18); color: #0a1520; }
+
+
 </style>
   <meta name="theme-color" content="#0d1b2a">
 </head>
 <body>
 
 <button id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir">☀️ Açık</button>
+<button id="global-home-btn" onclick="globalGoHome()" title="Ana Menüye Dön">🏠 Ana Menü</button>
 <div id="confetti-container"></div>
 <div id="win-overlay">
   <div class="win-box">
@@ -833,7 +1040,7 @@ body.light .win-box .win-stats { color: var(--subtext); }
 </div>
 
 <!-- HOME SCREEN -->
-<div id="screen-home" class="screen active">
+<div id="screen-home" class="screen active" style="overflow-y:auto;">
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:28px;padding:24px;">
     <div style="text-align:center;">
       <div style="font-size:4rem;margin-bottom:8px;animation:robotBob 2s ease-in-out infinite;">🤖</div>
@@ -842,16 +1049,20 @@ body.light .win-box .win-stats { color: var(--subtext); }
     </div>
     <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;width:100%;max-width:560px;">
       <div class="home-card" onclick="goToMap()" style="border-color:rgba(255,215,0,0.4);background:linear-gradient(145deg,rgba(255,215,0,0.1),rgba(255,165,0,0.05));">
-        <div style="font-size:3.5rem;margin-bottom:12px;">🎮</div>
-        <div style="font-family:'Fredoka One',cursive;font-size:1.45rem;color:var(--gold);margin-bottom:8px;">Tek Oyuncu</div>
-        <div style="color:var(--subtext);font-size:0.85rem;line-height:1.6;">400 bölüm • 20 tema<br>Yıldız topla, ilerle!</div>
-        <div style="margin-top:18px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a2e;border-radius:12px;padding:10px 16px;font-weight:900;font-size:0.95rem;">▶️ Bölümlere Git</div>
+        <div class="home-card-body">
+          <div style="font-size:3rem;margin-bottom:10px;">🎮</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--gold);margin-bottom:6px;">Tek Oyuncu</div>
+          <div style="color:var(--subtext);font-size:0.83rem;line-height:1.6;">400 bölüm • 20 tema<br>Yıldız topla, ilerle!</div>
+        </div>
+        <div class="home-card-btn" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a2e;border-radius:12px;padding:11px 16px;font-weight:900;font-size:0.95rem;">▶️ Bölümlere Git</div>
       </div>
       <div class="home-card" onclick="showLobby()" style="border-color:rgba(0,212,255,0.4);background:linear-gradient(145deg,rgba(0,212,255,0.1),rgba(0,150,255,0.05));">
-        <div style="font-size:3.5rem;margin-bottom:12px;">⚔️</div>
-        <div style="font-family:'Fredoka One',cursive;font-size:1.45rem;color:var(--accent);margin-bottom:8px;">Çok Oyunculu</div>
-        <div style="color:var(--subtext);font-size:0.85rem;line-height:1.6;">2 kişi karşılıklı<br>Şifreli eşleşme · Garanti bağlantı</div>
-        <div style="margin-top:18px;background:linear-gradient(135deg,var(--accent),#0099bb);color:white;border-radius:12px;padding:10px 16px;font-weight:900;font-size:0.95rem;">⚔️ VS Moduna Gir</div>
+        <div class="home-card-body">
+          <div style="font-size:3rem;margin-bottom:10px;">⚔️</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--accent);margin-bottom:6px;">Çok Oyunculu</div>
+          <div style="color:var(--subtext);font-size:0.83rem;line-height:1.6;">2 kişi karşılıklı<br>Şifreli eşleşme</div>
+        </div>
+        <div class="home-card-btn" style="background:linear-gradient(135deg,var(--accent),#0099bb);color:white;border-radius:12px;padding:11px 16px;font-weight:900;font-size:0.95rem;">⚔️ VS Moduna Gir</div>
       </div>
     </div>
     <div style="color:rgba(255,255,255,0.15);font-size:0.72rem;">v5 • PeerJS eşleşme</div>
@@ -860,10 +1071,13 @@ body.light .win-box .win-stats { color: var(--subtext); }
 
 <!-- WORLD MAP SCREEN -->
 <div id="screen-map" class="screen">
-  <div class="map-header" style="position:relative;">
-    <button onclick="switchScreen('screen-home')" style="position:absolute;left:0;top:0;padding:7px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;">← Menü</button>
-    <h1>🤖 Robot'u Eve Götür!</h1>
-    <p>Bölümünü seç ve robotu programla!</p>
+  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px;padding:12px 0 4px;">
+    <button onclick="switchScreen('screen-home')" style="padding:7px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;flex-shrink:0;">← Menü</button>
+    <div class="map-header" style="flex:1;text-align:center;">
+      <h1>🤖 Robot'u Eve Götür!</h1>
+      <p>Bölümünü seç ve robotu programla!</p>
+    </div>
+    <div style="width:80px;flex-shrink:0;"></div>
   </div>
   <div class="progress-bar-wrap">
     <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
@@ -878,7 +1092,6 @@ body.light .win-box .win-stats { color: var(--subtext); }
 
   <!-- TOP BAR -->
   <div class="game-topbar">
-    <button class="back-btn" onclick="goMap()">← Harita</button>
     <div class="level-info">
       <span class="theme-badge" id="theme-badge">🏜️</span>
       <h2 id="level-title">Bölüm 1</h2>
@@ -891,67 +1104,79 @@ body.light .win-box .win-stats { color: var(--subtext); }
     </div>
   </div>
 
-  <!-- MAIN LAYOUT: grid sol, kontroller sağ -->
-  <div class="game-main">
+  <!-- GRID — ortada -->
+  <div class="grid-section">
+    <div id="grid"></div>
+    <div id="message"></div>
+  </div>
 
-    <!-- SOL: Grid + mesaj -->
-    <div class="grid-section">
-      <div id="grid"></div>
-      <div id="message"></div>
-    </div>
+  <!-- ALT KONTROL ŞERIDI — grid'in hemen altında, tam genişlik -->
+  <div class="game-bottom-bar">
 
-    <!-- SAĞ: Kompakt kontrol paneli -->
-    <div class="panel">
+    <!-- Satır 1: Mod + Program + Hız -->
+    <div class="gbb-row1">
 
-      <!-- MOD + HIZ tek satırda -->
-      <div class="pbox" style="padding:8px 10px;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <div class="mode-toggle" style="flex:1;min-width:160px;">
-            <button class="mode-btn active" id="mode-step" onclick="setMode('step')">👟 Adım</button>
-            <button class="mode-btn" id="mode-slide" onclick="setMode('slide')">💨 Kadar</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:5px;flex:1;min-width:100px;">
-            <span style="font-size:0.8rem;">🐢</span>
-            <input type="range" id="speed-slider" min="150" max="850" value="500" step="50" style="flex:1;accent-color:var(--gold);">
-            <span style="font-size:0.8rem;">🐇</span>
-          </div>
+      <!-- Mod seçici -->
+      <div class="gbb-block">
+        <div class="gbb-label">Mod</div>
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="mode-step" onclick="setMode('step')">👟 Adım</button>
+          <button class="mode-btn" id="mode-slide" onclick="setMode('slide')">💨 Kadar</button>
         </div>
-        <p class="mode-tip" id="mode-tip" style="margin-top:4px;">Her komut 1 adım ilerler</p>
+        <p class="mode-tip" id="mode-tip">Her komut 1 adım</p>
       </div>
 
-      <!-- KOMUTLAR: 6'lı grid (yön + 2 özel) -->
-      <div class="pbox" style="padding:8px 10px;">
-        <div class="ptitle" style="margin-bottom:6px;">🕹️ Komutlar <span style="font-size:0.65rem;color:rgba(255,255,255,0.25);font-weight:400;">tıkla ekle</span></div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
-          <div style="grid-column:1;grid-row:1;"></div>
-          <button class="cmd-btn" onclick="addCmd('up')" style="grid-column:2;grid-row:1;">⬆️</button>
-          <div style="grid-column:3;grid-row:1;"></div>
-          <button class="cmd-btn" onclick="addCmd('left')" style="grid-column:1;grid-row:2;">⬅️</button>
-          <div class="cmd-btn" style="grid-column:2;grid-row:2;opacity:0.2;pointer-events:none;">🤖</div>
-          <button class="cmd-btn" onclick="addCmd('right')" style="grid-column:3;grid-row:2;">➡️</button>
-          <button class="cmd-btn obstacle" onclick="addCmd('bomb')" style="grid-column:1;grid-row:3;" title="💣 Engel koy">💣</button>
-          <button class="cmd-btn" onclick="addCmd('down')" style="grid-column:2;grid-row:3;">⬇️</button>
-          <button class="cmd-btn pit" onclick="addCmd('pit')" style="grid-column:3;grid-row:3;" title="🕳️ Çukur aç">🕳️</button>
-        </div>
-      </div>
+      <!-- Divider -->
+      <div class="gbb-div"></div>
 
-      <!-- PROGRAM SIRASI -->
-      <div class="pbox" style="padding:8px 10px;">
-        <div class="ptitle" style="margin-bottom:5px;">📋 Program <span style="font-size:0.65rem;color:rgba(255,255,255,0.25);font-weight:400;">tıkla sil</span></div>
+      <!-- Program sırası -->
+      <div class="gbb-block" style="flex:2;min-width:180px;">
+        <div class="gbb-label">📋 Program <span style="font-weight:400;opacity:0.5;">tıkla → sil</span></div>
         <div id="sequence"><span class="seq-empty">Henüz komut yok...</span></div>
         <div class="step-counter" id="step-counter">0 / 12 komut</div>
       </div>
 
-      <!-- BUTONLAR -->
-      <button class="run-btn" id="run-btn" onclick="runProgram()">▶️ Çalıştır!</button>
-      <div style="display:flex;gap:6px;">
-        <button class="sec-btn" onclick="clearSeq()" style="flex:1;">🗑️ Temizle</button>
-        <button class="danger-btn" onclick="resetGame()" style="flex:1;">🔄 Başa Dön</button>
+      <!-- Divider -->
+      <div class="gbb-div"></div>
+
+      <!-- Hız -->
+      <div class="gbb-block">
+        <div class="gbb-label">⚡ Hız</div>
+        <div class="speed-row">
+          <span>🐢</span>
+          <input type="range" id="speed-slider" min="150" max="850" value="500" step="50" style="accent-color:var(--gold);width:80px;">
+          <span>🐇</span>
+        </div>
       </div>
 
-      <!-- REHBER -->
-      <div class="pbox" style="padding:8px 10px;">
-        <div class="ptitle" style="margin-bottom:5px;">📖 Rehber</div>
+    </div>
+
+    <!-- Satır 2: Komutlar + Aksiyon butonları -->
+    <div class="gbb-row2">
+
+      <!-- 3x3 yön tuşları -->
+      <div class="gbb-dpad">
+        <div></div>
+        <button class="cmd-btn" onclick="addCmd('up')">⬆️</button>
+        <div></div>
+        <button class="cmd-btn" onclick="addCmd('left')">⬅️</button>
+        <div class="cmd-btn" style="opacity:0.2;pointer-events:none;">🤖</div>
+        <button class="cmd-btn" onclick="addCmd('right')">➡️</button>
+        <button class="cmd-btn obstacle" onclick="addCmd('bomb')" title="💣 Engel">💣</button>
+        <button class="cmd-btn" onclick="addCmd('down')">⬇️</button>
+        <button class="cmd-btn pit" onclick="addCmd('pit')" title="🕳️ Çukur">🕳️</button>
+      </div>
+
+      <!-- Aksiyon butonları -->
+      <div class="gbb-actions">
+        <button class="run-btn" id="run-btn" onclick="runProgram()">▶️ Çalıştır!</button>
+        <button class="sec-btn" onclick="clearSeq()">🗑️ Temizle</button>
+        <button class="danger-btn" onclick="resetGame()">🔄 Başa Dön</button>
+      </div>
+
+      <!-- Rehber -->
+      <div class="gbb-legend">
+        <div class="gbb-label">📖 Rehber</div>
         <div class="legend" id="legend"></div>
       </div>
 
@@ -1977,16 +2202,18 @@ function toggleTheme() {
   const isLight = document.body.classList.toggle('light');
   const btn = document.getElementById('theme-toggle');
   btn.textContent = isLight ? '🌙 Koyu' : '☀️ Açık';
+  btn.title = isLight ? 'Koyu temaya geç' : 'Açık temaya geç';
   localStorage.setItem('rte_theme', isLight ? 'light' : 'dark');
 }
-// Kayıtlı temayı uygula
+// Kayıtlı temayı uygula — script body'den sonra çalışır, buton zaten DOM'da
 (function(){
   const saved = localStorage.getItem('rte_theme');
   if (saved === 'light') {
     document.body.classList.add('light');
+    // Buton bu scriptten sonra DOM'da — DOMContentLoaded veya defer ile güncelle
     document.addEventListener('DOMContentLoaded', () => {
       const btn = document.getElementById('theme-toggle');
-      if (btn) btn.textContent = '🌙 Koyu';
+      if (btn) { btn.textContent = '🌙 Koyu'; btn.title = 'Koyu temaya geç'; }
     });
   }
 })();
@@ -2028,37 +2255,55 @@ function toggleTheme() {
 .char-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
 .char-card {
   aspect-ratio: 1;
-  border-radius: 16px;
+  border-radius: 14px;
   border: 2.5px solid var(--border);
-  background: var(--card);
+  background: rgba(255,255,255,0.05);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 4px;
+  gap: 3px; padding: 6px 4px;
   cursor: pointer;
-  transition: all 0.18s;
-  font-size: 2rem;
+  transition: all 0.2s cubic-bezier(.34,1.56,.64,1);
+  font-size: 1.9rem;
   position: relative;
   overflow: hidden;
 }
-.char-card:hover { transform: scale(1.08); border-color: rgba(255,255,255,0.3); }
+.char-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(255,107,255,0.15), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.char-card:hover { transform: translateY(-4px) scale(1.07); border-color: rgba(255,255,255,0.28); }
+.char-card:hover::before { opacity: 1; }
 .char-card.selected {
-  border-color: #ff6bff;
-  background: rgba(255,107,255,0.18);
-  box-shadow: 0 0 18px rgba(255,107,255,0.5);
-  transform: scale(1.08);
+  border-color: #dd44ff;
+  background: rgba(221,68,255,0.15);
+  box-shadow: 0 0 0 2px rgba(221,68,255,0.4), 0 8px 24px rgba(221,68,255,0.35);
+  transform: translateY(-3px) scale(1.06);
 }
+.char-card.selected::before { opacity: 1; }
+.char-card .char-emoji {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+  transition: transform 0.2s;
+  line-height: 1;
+}
+.char-card.selected .char-emoji { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(221,68,255,0.6)); }
 .char-card .char-label {
-  font-size: 0.58rem; font-weight: 900; color: var(--subtext);
-  text-align: center; line-height: 1;
+  font-size: 0.6rem; font-weight: 900; color: var(--subtext);
+  text-align: center; line-height: 1; letter-spacing: 0.3px;
 }
+.char-card.selected .char-label { color: #ee88ff; }
 .char-card .char-check {
-  position: absolute; top: 4px; right: 6px;
-  font-size: 0.75rem; color: #ff6bff;
+  position: absolute; top: 3px; right: 5px;
+  font-size: 0.7rem; color: #dd44ff;
   display: none;
 }
 .char-card.selected .char-check { display: block; }
@@ -2237,12 +2482,14 @@ function toggleTheme() {
 
 .vs-top {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 12px;
+  padding: 6px 80px 6px 80px; /* space for both fixed buttons */
   background: rgba(0,0,0,0.5);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex: 0 0 auto;
   flex-shrink: 0;
   gap: 6px;
+  min-height: 44px;
 }
 .vs-pinfo {
   display: flex; align-items: center; gap: 6px;
@@ -2262,9 +2509,12 @@ function toggleTheme() {
 
 .vs-prog-strip {
   display: flex; align-items: center; gap: 6px;
-  padding: 5px 12px;
+  padding: 4px 12px;
   background: rgba(0,0,0,0.3);
   flex-shrink: 0;
+  width: 98%;
+  margin: 0 1%;
+  box-sizing: border-box;
 }
 .vs-bar-wrap { flex:1; height:8px; background:rgba(255,255,255,0.08); border-radius:8px; overflow:hidden; }
 .vs-bar-me  { height:100%; background:linear-gradient(90deg,#ff6bff,#9b4dff); border-radius:8px; transition:width 0.4s ease; }
@@ -2275,113 +2525,220 @@ function toggleTheme() {
 .vs-body {
   flex: 1;
   display: flex;
-  gap: 0;
+  flex-direction: column;
   overflow: hidden;
   min-height: 0;
 }
 
-/* Grid area fills left side */
+/* Grid area — kalan alanı kaplar */
 .vs-grid-area {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  min-width: 0;
+  padding: 6px 8px 4px;
+  overflow: hidden;
 }
 
-/* Controls panel — right side, compact */
+/* ── VS ALT KONTROL BARI ── */
 .vs-ctrl {
-  width: 170px;
   flex-shrink: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0;
+  background: rgba(0,0,0,0.4);
+  border-top: 2px solid rgba(255,255,255,0.10);
+  width: 98%;
+  margin: 0 1%;
+  border-radius: 12px 12px 0 0;
+  box-sizing: border-box;
+}
+
+/* Her bölüm */
+.vs-ctrl-section {
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 8px 8px 8px 4px;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.25);
-  border-left: 1px solid rgba(255,255,255,0.06);
+  gap: 5px;
+}
+.vs-ctrl-section + .vs-ctrl-section {
+  border-left: 1px solid rgba(255,255,255,0.07);
+}
+.vs-ctrl-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.vs-ctrl-sublabel {
+  font-size: 0.58rem;
+  color: rgba(255,255,255,0.3);
+  font-style: italic;
+  font-weight: 400;
 }
 
-@media (max-width: 500px) {
-  .vs-ctrl { width: 140px; }
-  .vs-body { gap: 0; }
-}
-
-.vs-pbox {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  padding: 8px;
-}
-.vs-ptitle {
-  font-size: 0.7rem; font-weight: 900; color: var(--gold);
-  margin-bottom: 6px; letter-spacing: 0.2px;
-}
-
-/* Compact dir-pad */
-.vs-dir-pad {
+/* SOL: D-pad + özel butonlar */
+.vs-dpad-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 4px;
-  margin-bottom: 4px;
+  grid-template-columns: repeat(3, 38px);
+  grid-template-rows: repeat(3, 38px);
+  gap: 3px;
 }
-.vs-dir-pad .dc { height: 36px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color:white; font-size:1rem; cursor:pointer; transition:all 0.12s; display:flex;align-items:center;justify-content:center; }
-.vs-dir-pad .dc:hover { background:rgba(255,215,0,0.18); border-color:var(--gold); }
-.vs-dir-pad .dc:active { transform:scale(0.9); }
-.vs-dir-pad .dc.center { opacity:0.2; pointer-events:none; }
-.vs-dir-pad .dc.up    { grid-column:2; grid-row:1; }
-.vs-dir-pad .dc.left  { grid-column:1; grid-row:2; }
-.vs-dir-pad .dc.center{ grid-column:2; grid-row:2; }
-.vs-dir-pad .dc.right { grid-column:3; grid-row:2; }
-.vs-dir-pad .dc.down  { grid-column:2; grid-row:3; }
+.vs-dpad-grid .dc {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: white; font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.1s;
+  display: flex; align-items: center; justify-content: center;
+}
+.vs-dpad-grid .dc:hover  { background: rgba(255,215,0,0.2); border-color: var(--gold); transform: scale(1.08); }
+.vs-dpad-grid .dc:active { transform: scale(0.9); }
+.vs-dpad-grid .dc.center { opacity: 0.15; pointer-events: none; }
 
-/* Special move buttons */
-.vs-special { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px; }
-.vs-special .dc { height:32px; font-size:0.75rem; font-weight:800; border-radius:8px; border:1.5px solid; background:none; cursor:pointer; transition:all 0.12s; }
-.vs-special .dc.jump  { border-color:rgba(100,200,255,0.4); color:#80e8ff; }
-.vs-special .dc.break { border-color:rgba(255,150,50,0.4);  color:#ffb366; }
-.vs-special .dc.jump:hover  { background:rgba(100,200,255,0.15); }
-.vs-special .dc.break:hover { background:rgba(255,150,50,0.15); }
+.vs-specials {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  margin-top: 2px;
+}
+.vs-specials .dc {
+  height: 30px; font-size: 0.72rem; font-weight: 800;
+  border-radius: 7px; border: 1.5px solid; background: none;
+  cursor: pointer; transition: all 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 3px;
+}
+.vs-specials .dc.jump  { border-color: rgba(100,200,255,0.4); color: #80e8ff; }
+.vs-specials .dc.break { border-color: rgba(255,150,50,0.4);  color: #ffb366; }
+.vs-specials .dc.jump:hover  { background: rgba(100,200,255,0.15); }
+.vs-specials .dc.break:hover { background: rgba(255,150,50,0.15);  }
 
-/* Sequence display */
+/* ORTA: Program sırası */
 .vs-seq {
-  display:flex; flex-wrap:wrap; gap:3px;
-  min-height:38px;
-  background:rgba(0,0,0,0.25); border-radius:8px; padding:5px;
-  align-content:flex-start;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-auto-rows: auto;
+  gap: 3px;
+  min-height: 52px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 6px;
+  align-content: start;
+  overflow: hidden;
+  flex: 1;
 }
-.vs-seq-empty { color:rgba(255,255,255,0.25); font-size:0.7rem; font-style:italic; }
+.vs-seq-empty { color: rgba(255,255,255,0.2); font-size: 0.7rem; font-style: italic; grid-column: 1 / -1; text-align: center; align-self: center; padding: 8px 0; }
 .vs-si {
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:#1a1a2e; border-radius:6px; padding:3px 6px;
-  font-size:0.88rem; font-weight:900; cursor:pointer; transition:all 0.1s;
-  animation:popIn 0.15s ease;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #1a1a2e; border-radius: 6px; padding: 4px 7px;
+  font-size: 0.9rem; font-weight: 900; cursor: pointer;
+  transition: all 0.1s; animation: popIn 0.15s ease;
 }
-.vs-si:hover { opacity:0.7; transform:scale(1.1); }
-.vs-si.active  { background:linear-gradient(135deg,#00ff88,#00cc55); box-shadow:0 0 8px rgba(0,255,136,0.6); }
-.vs-si.errored { background:linear-gradient(135deg,#ff5252,#cc0000); }
+.vs-si:hover   { opacity: 0.7; transform: scale(1.1); }
+.vs-si.active  { background: linear-gradient(135deg,#00ff88,#00cc55); box-shadow: 0 0 8px rgba(0,255,136,0.6); }
+.vs-si.errored { background: linear-gradient(135deg,#ff5252,#cc0000); }
 
+.vs-seq-counter {
+  font-size: 0.68rem; font-weight: 800; color: var(--subtext);
+  text-align: right;
+}
+.vs-seq-counter.warn   { color: var(--gold); }
+.vs-seq-counter.danger { color: var(--danger); }
+
+/* SAĞ: Hız + Aksiyon */
 .vs-run-btn {
-  width:100%; padding:11px 6px;
-  border-radius:11px; border:none;
-  background:linear-gradient(135deg,#00c853,#00e676);
-  color:white; font-family:'Nunito',sans-serif;
-  font-size:0.88rem; font-weight:900; cursor:pointer;
-  box-shadow:0 3px 14px rgba(0,200,83,0.4);
-  transition:all 0.18s;
+  padding: 11px 14px;
+  border-radius: 10px; border: none;
+  background: linear-gradient(135deg,#00c853,#00e676);
+  color: white; font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem; font-weight: 900; cursor: pointer;
+  box-shadow: 0 3px 14px rgba(0,200,83,0.4);
+  transition: all 0.18s; white-space: nowrap;
 }
-.vs-run-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 5px 18px rgba(0,200,83,0.6); }
-.vs-run-btn:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
-.vs-run-btn.waiting { background:linear-gradient(135deg,#ff9800,#ff6600); box-shadow:0 3px 14px rgba(255,152,0,0.4); }
+.vs-run-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(0,200,83,0.6); }
+.vs-run-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+.vs-run-btn.waiting  { background: linear-gradient(135deg,#ff9800,#ff6600); animation: waitPulse 1.2s ease infinite; }
 
-.vs-mini-btn { width:100%; padding:7px; border-radius:9px; border:1px solid var(--border); background:var(--card); color:var(--subtext); font-family:'Nunito',sans-serif; font-size:0.75rem; font-weight:800; cursor:pointer; transition:all 0.13s; }
-.vs-mini-btn:hover { background:rgba(255,255,255,0.08); color:var(--text); }
+.vs-mini-btn {
+  padding: 7px 10px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card); color: var(--subtext);
+  font-family: 'Nunito', sans-serif; font-size: 0.78rem;
+  font-weight: 800; cursor: pointer; transition: all 0.13s;
+  white-space: nowrap;
+}
+.vs-mini-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 
-.vs-seq-counter { font-size:0.68rem; font-weight:800; color:var(--subtext); text-align:right; margin-top:2px; }
-.vs-seq-counter.warn { color:var(--gold); }
-.vs-seq-counter.danger { color:var(--danger); }
+
+/* Hız seçici — 3 radio buton */
+.vs-speed-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.vs-speed-opt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 7px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  transition: all 0.15s;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--subtext);
+  user-select: none;
+}
+.vs-speed-opt:hover { border-color: rgba(255,215,0,0.35); background: rgba(255,215,0,0.06); }
+.vs-speed-opt.selected {
+  border-color: var(--gold);
+  background: rgba(255,215,0,0.12);
+  color: var(--gold);
+}
+.vs-speed-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.vs-speed-opt.selected .vs-speed-dot {
+  border-color: var(--gold);
+  background: var(--gold);
+  box-shadow: 0 0 6px rgba(255,215,0,0.5);
+}
+.vs-speed-dot::after {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #1a1a2e;
+  display: none;
+}
+.vs-speed-opt.selected .vs-speed-dot::after { display: block; }
+body.light .vs-speed-opt { color: var(--subtext); border-color: rgba(0,0,0,0.12); background: rgba(0,0,0,0.03); }
+body.light .vs-speed-opt.selected { border-color: var(--gold); background: rgba(184,134,11,0.1); color: var(--gold); }
+/* Hız satırı */
+.vs-speed-row {
+  display: flex; align-items: center; gap: 5px;
+}
+.vs-speed-row input[type=range] { flex: 1; accent-color: var(--gold); min-width: 80px; }
+
+@media (max-width: 600px) {
+  .vs-ctrl { grid-template-columns: auto 1fr auto; }
+  .vs-ctrl-section { padding: 8px; }
+  .vs-dpad-grid { grid-template-columns: repeat(3,34px); grid-template-rows: repeat(3,34px); }
+  .vs-dpad-grid .dc { width:34px; height:34px; font-size:0.9rem; }
+}
 
 /* Countdown overlay */
 .vs-countdown-overlay {
@@ -2438,7 +2795,7 @@ function toggleTheme() {
 
 /* Mobile: stack grid above controls */
 @media (max-width: 420px) {
-  .vs-body { flex-direction: column; overflow-y: auto; }
+  .vs-body { flex-direction: column; overflow: hidden; }
   .vs-ctrl { width: 100%; flex-direction: row; flex-wrap: wrap; padding: 8px; border-left: none; border-top: 1px solid rgba(255,255,255,0.06); }
   .vs-ctrl > * { flex: 0 0 auto; }
 }
@@ -2447,7 +2804,7 @@ function toggleTheme() {
 <!-- ════════════════════════════════════════════════════
   CHARACTER SELECT SCREEN
 ════════════════════════════════════════════════════ -->
-<div id="screen-charselect" class="screen">
+<div id="screen-charselect" class="screen" style="overflow-y:auto;">
   <div class="cs-wrap">
     <h1 class="cs-title">⚔️ VS Modu</h1>
     <p class="cs-sub">Karakterini seç ve adını yaz</p>
@@ -2470,7 +2827,7 @@ function toggleTheme() {
 <!-- ════════════════════════════════════════════════════
   LOBBY SCREEN — ŞİFRELİ EŞLEŞİM
 ════════════════════════════════════════════════════ -->
-<div id="screen-lobby" class="screen">
+<div id="screen-lobby" class="screen" style="overflow-y:auto;">
   <div class="lobby-wrap">
     <div class="lobby-title">🕹️ Oyun Lobisi</div>
 
@@ -2535,6 +2892,19 @@ function toggleTheme() {
 ════════════════════════════════════════════════════ -->
 <div id="screen-vs" class="screen">
 
+  <!-- Ana sayfa onay overlay -->
+  <div id="vs-home-confirm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:1100;align-items:center;justify-content:center;">
+    <div style="background:linear-gradient(145deg,#1a0a2e,#0d0820);border:2px solid rgba(255,82,82,0.5);border-radius:20px;padding:32px 28px;max-width:340px;width:90%;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:10px;">🏠</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--gold);margin-bottom:8px;">Ana Sayfaya Dön?</div>
+      <div style="color:var(--subtext);font-size:0.88rem;margin-bottom:22px;line-height:1.6;">Mevcut maç sona erecek.<br>Emin misin?</div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="vsConfirmHome()" style="flex:1;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#ff5252,#cc0000);color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;cursor:pointer;">✅ Evet, Çık</button>
+        <button onclick="vsCloseConfirm()" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;cursor:pointer;">❌ İptal</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Countdown -->
   <div class="vs-countdown-overlay gone" id="vs-cd-overlay">
     <div class="vs-cd-title" id="vs-cd-title">Hazır mısın?</div>
@@ -2587,58 +2957,79 @@ function toggleTheme() {
   <!-- Body: grid + mini-opp + controls -->
   <div class="vs-body">
 
-    <!-- Grid area: my grid + opponent mini-grid -->
+    <!-- Grid area: my grid + opponent mini-grid — ÜSTTE -->
     <div class="vs-grid-area">
-      <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+      <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;justify-content:center;">
         <!-- My grid -->
         <div>
           <div style="font-size:0.68rem;font-weight:900;color:rgba(255,107,255,0.8);margin-bottom:4px;text-align:center;">👤 Senin gridın</div>
           <div id="vs-grid" style="position:relative"></div>
         </div>
         <!-- Opponent mini-grid -->
-        <div id="vs-opp-grid-wrap" style="opacity:0.75;">
+        <div id="vs-opp-grid-wrap" style="opacity:0.8;">
           <div style="font-size:0.68rem;font-weight:900;color:rgba(128,232,255,0.8);margin-bottom:4px;text-align:center;" id="vs-opp-grid-label">👾 Rakip</div>
           <div id="vs-opp-grid" style="position:relative;"></div>
         </div>
       </div>
-      <div id="vs-msg" style="font-size:0.8rem;font-weight:800;min-height:20px;text-align:center;margin-top:6px;color:var(--subtext)"></div>
+      <div id="vs-msg" style="font-size:0.8rem;font-weight:800;min-height:18px;text-align:center;margin-top:5px;color:var(--subtext)"></div>
     </div>
 
-    <!-- Controls -->
+    <!-- Kontroller — ALTTA, 3 bölüm -->
     <div class="vs-ctrl" id="vs-ctrl">
-      <div class="vs-pbox">
-        <div class="vs-ptitle">🕹️ HAREKET</div>
-        <div class="vs-dir-pad">
-          <button class="dc up"     onclick="vsAddCmd('up')">⬆️</button>
-          <button class="dc left"   onclick="vsAddCmd('left')">⬅️</button>
-          <div    class="dc center">🤖</div>
-          <button class="dc right"  onclick="vsAddCmd('right')">➡️</button>
-          <button class="dc down"   onclick="vsAddCmd('down')">⬇️</button>
-        </div>
-        <div class="vs-special">
-          <button class="dc jump"  onclick="vsAddCmd('jump')"  title="Önündekinin üstünden atla">🦘 Atla</button>
-          <button class="dc break" onclick="vsAddCmd('break')" title="Önündeki duvarı yık">💥 Yık</button>
-        </div>
-      </div>
 
-      <div class="vs-pbox">
-        <div class="vs-ptitle">📋 PROGRAM</div>
-        <div class="vs-seq" id="vs-seq"><span class="vs-seq-empty">Komut yok…</span></div>
-        <div class="vs-seq-counter" id="vs-seq-ctr">0/16</div>
-      </div>
-
-      <div class="vs-pbox">
-        <div class="vs-ptitle">⚡ HIZ</div>
-        <div class="speed-row">
-          <label style="font-size:0.75rem">🐢</label>
-          <input type="range" id="vs-speed" min="80" max="750" value="350" step="50" style="flex:1;accent-color:var(--gold)">
-          <label style="font-size:0.75rem">🐇</label>
+      <!-- SOL: Komut ekle -->
+      <div class="vs-ctrl-section">
+        <div class="vs-ctrl-label">Komut Ekle <span class="vs-ctrl-sublabel">tıkla → sıraya gider</span></div>
+        <div class="vs-dpad-grid">
+          <div></div>
+          <button class="dc" onclick="vsAddCmd('up')" style="grid-column:2;grid-row:1;">⬆️</button>
+          <div></div>
+          <button class="dc" onclick="vsAddCmd('left')">⬅️</button>
+          <div class="dc center">🤖</div>
+          <button class="dc" onclick="vsAddCmd('right')">➡️</button>
+          <div></div>
+          <button class="dc" onclick="vsAddCmd('down')">⬇️</button>
+          <div></div>
+        </div>
+        <div class="vs-specials">
+          <button class="dc jump"  onclick="vsAddCmd('jump')">🦘 Atla</button>
+          <button class="dc break" onclick="vsAddCmd('break')">💥 Yık</button>
         </div>
       </div>
 
-      <button class="vs-run-btn" id="vs-run-btn" onclick="vsRun()">▶️ Çalıştır!</button>
-      <button class="vs-mini-btn" onclick="vsClear()">🗑️ Temizle</button>
-      <button class="vs-mini-btn" onclick="vsResetPos()">🔄 Başa Al</button>
+      <!-- ORTA: Program sırası -->
+      <div class="vs-ctrl-section">
+        <div class="vs-ctrl-label">📋 Program Sırası <span class="vs-ctrl-sublabel">komuta tıkla → sil</span></div>
+        <div class="vs-seq" id="vs-seq"><span class="vs-seq-empty">Henüz komut eklenmedi…</span></div>
+        <div class="vs-seq-counter" id="vs-seq-ctr">0 / 16 komut</div>
+      </div>
+
+      <!-- SAĞ: Hız + Aksiyon -->
+      <div class="vs-ctrl-section" style="min-width:130px;justify-content:space-between;">
+        <div>
+          <div class="vs-ctrl-label" style="margin-bottom:6px;">⚡ Hız</div>
+          <div class="vs-speed-opts">
+            <label class="vs-speed-opt" onclick="setVsSpeed(150)">
+              <div class="vs-speed-dot"></div>🐢 Yavaş
+            </label>
+            <label class="vs-speed-opt selected" onclick="setVsSpeed(350)">
+              <div class="vs-speed-dot"></div>🚶 Normal
+            </label>
+            <label class="vs-speed-opt" onclick="setVsSpeed(650)">
+              <div class="vs-speed-dot"></div>🐇 Hızlı
+            </label>
+          </div>
+          <input type="hidden" id="vs-speed" value="350">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">
+          <button class="vs-run-btn" id="vs-run-btn" onclick="vsRun()">▶️ Çalıştır!</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <button class="vs-mini-btn" onclick="vsClear()">🗑️ Temizle</button>
+            <button class="vs-mini-btn" onclick="vsResetPos()">🔄 Başa Al</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -2651,11 +3042,16 @@ function toggleTheme() {
 //  CHARACTERS
 // ════════════════════════════════════════════════════════════════
 const CHARACTERS = [
-  { id:'robot',   emoji:'🤖', name:'Robot',    color:'#00d4ff' },
-  { id:'alien',   emoji:'👾', name:'Uzaylı',   color:'#00ff88' },
-  { id:'wizard',  emoji:'🧙', name:'Sihirbaz', color:'#cc44ff' },
-  { id:'ninja',   emoji:'🥷', name:'Ninja',    color:'#ff6644' },
-  { id:'astronaut',emoji:'🧑‍🚀',name:'Astronot', color:'#44aaff' },
+  { id:'robot',     emoji:'🤖', name:'Robot',     color:'#00d4ff' },
+  { id:'alien',     emoji:'👾', name:'Uzaylı',    color:'#00ff88' },
+  { id:'wizard',    emoji:'🧙', name:'Sihirbaz',  color:'#cc44ff' },
+  { id:'ninja',     emoji:'🥷', name:'Ninja',     color:'#ff6644' },
+  { id:'astronaut', emoji:'🧑‍🚀', name:'Astronot', color:'#44aaff' },
+  { id:'dragon',    emoji:'🐲', name:'Ejderha',   color:'#ff4400' },
+  { id:'ghost',     emoji:'👻', name:'Hayalet',   color:'#aaaaff' },
+  { id:'cat',       emoji:'🐱', name:'Kedi',      color:'#ffaa00' },
+  { id:'fox',       emoji:'🦊', name:'Tilki',     color:'#ff7733' },
+  { id:'penguin',   emoji:'🐧', name:'Penguen',   color:'#55ccff' },
 ];
 
 let myChar = CHARACTERS[0];
@@ -2672,7 +3068,7 @@ function renderCharGrid() {
   CHARACTERS.forEach((ch, i) => {
     const card = document.createElement('div');
     card.className = 'char-card' + (i === 0 ? ' selected' : '');
-    card.innerHTML = `<span>${ch.emoji}</span><span class="char-label">${ch.name}</span><span class="char-check">✓</span>`;
+    card.innerHTML = `<span class="char-emoji">${ch.emoji}</span><span class="char-label">${ch.name}</span><span class="char-check">✓</span>`;
     card.onclick = () => {
       document.querySelectorAll('.char-card').forEach(c=>c.classList.remove('selected'));
       card.classList.add('selected');
@@ -2718,6 +3114,23 @@ function switchScreen(id) {
   el.classList.add('active');
   if (id === 'screen-vs') { el.style.display = 'flex'; document.body.style.overflow='hidden'; }
   else { document.body.style.overflow=''; }
+  // Show global home button only during gameplay screens
+  const homeBtn = document.getElementById('global-home-btn');
+  if (homeBtn) {
+    const showOn = ['screen-game', 'screen-vs', 'screen-map', 'screen-lobby', 'screen-charselect'];
+    homeBtn.style.display = showOn.includes(id) ? 'block' : 'none';
+  }
+}
+
+function globalGoHome() {
+  // If in VS match, ask confirmation
+  if (document.getElementById('screen-vs').classList.contains('active')) {
+    vsAskHome();
+    return;
+  }
+  running = false;
+  cleanupMatch && cleanupMatch();
+  switchScreen('screen-home');
 }
 
 function vsBackToLobby() {
@@ -2838,9 +3251,14 @@ function handleIncoming(c) {
       pendingConn = c;
       showJoinRequest(msg.from, c);
     } else {
-      // Already in game
       handleGameMsg(msg);
     }
+  });
+  c.on('close', () => {
+    if (c === myConn && !vsMatchDone) setLobStat('⚠️ Bağlantı kesildi','err');
+  });
+  c.on('error', e => {
+    if (c === myConn && !vsMatchDone) setLobStat('❌ Bağlantı hatası: ' + (e.type||e),'err');
   });
 }
 
@@ -2859,10 +3277,13 @@ function acceptJoin() {
   isHost = true;
   myConn.on('data', d => handleGameMsg(JSON.parse(d)));
   myConn.on('close', () => { if (!vsMatchDone) setLobStat('⚠️ Bağlantı kesildi','err'); });
-  // Remove self from registry (we're taken)
-  removeFromRegistry();
-  cancelWait();
-  // Send acceptance + level
+  // Sadece UI temizle — cancelRoom() ÇAĞIRMA (myPeer.destroy() yapar!)
+  waitingInLobby = false;
+  document.getElementById('room-code-box').style.display = 'none';
+  document.getElementById('lob-wait-btn').textContent = '🏠 Oda Oluştur';
+  document.getElementById('lob-wait-btn').onclick = createRoom;
+  document.getElementById('join-code-area').style.display = 'block';
+  setLobStat('', '');
   vsCurrentLevel = generateVSLevel();
   sendGame({ type: 'ACCEPTED', from: { name: myName, avatar: myChar.emoji }, level: vsCurrentLevel });
   setTimeout(() => startVSMatch(from), 300);
@@ -2904,6 +3325,8 @@ let vsTimerStart    = 0;
 let vsOpName = ''; let vsOpAvatar = '';
 let vsOpPos  = []; let vsOpProg  = 0;
 let vsOppFinalSeq = [];
+let vsMyFinished  = false;  // kendi programım bitti (kazanmadan)
+let vsOppFinished = false;  // rakibin programı bitti (kazanmadan)
 
 const VS_DIRS = { up:[-1,0], down:[1,0], left:[0,-1], right:[0,1] };
 const VS_ICONS = { up:'⬆️', down:'⬇️', left:'⬅️', right:'➡️', jump:'🦘', break:'💥' };
@@ -2989,6 +3412,7 @@ function handleGameMsg(msg) {
       break;
     case 'MY_SEQ':
       vsOppFinalSeq = msg.seq || [];
+      vsOppFinished = true;
       // Eğer sonuç ekranı açıksa canlı güncelle
       const _histEl = document.getElementById('vs-res-history');
       if (_histEl && _histEl.dataset.waiting === '1') {
@@ -2997,6 +3421,7 @@ function handleGameMsg(msg) {
         _histEl.innerHTML = _buildHistoryHTML(_myStr, _oppStr);
         _histEl.dataset.waiting = '0';
       }
+      checkBothFinished();
       break;
   }
 }
@@ -3015,6 +3440,8 @@ function startVSMatch(oppInfo) {
   vsRunning = false; vsMatchDone = false; vsMatchActive = false;
   vsMyReady = false; vsOppReady  = false;
   vsOppFinalSeq = [];
+  vsMyFinished  = false;
+  vsOppFinished = false;
 
   // Update top bar
   document.getElementById('vs-me-av').textContent = myChar.emoji;
@@ -3343,7 +3770,9 @@ async function executeProgram() {
     document.getElementById('vs-run-btn').disabled = false;
     document.getElementById('vs-run-btn').textContent = '▶️ Çalıştır!';
     document.getElementById('vs-run-btn').className = 'vs-run-btn';
+    vsMyFinished = true;
     sendGame({type:'MY_SEQ', seq:vsMySeq});
+    checkBothFinished();
   }
   vsRunning = false;
 }
@@ -3398,6 +3827,15 @@ function showOppToast(txt) {
   t.className='vs-opp-toast'; t.textContent=txt;
   const ga=document.getElementById('vs-grid');
   if(ga){ga.style.position='relative';ga.appendChild(t);setTimeout(()=>t.remove(),1900);}
+}
+
+function checkBothFinished() {
+  if (!vsMyFinished || !vsOppFinished) return;
+  if (vsMatchDone) return;
+  vsMatchDone = true;
+  clearInterval(vsTimerInterval);
+  // İkisi de kazanamadı
+  showVSResult(false, null);
 }
 
 function _makeProgBars(myProg, oppProg) {
@@ -3468,6 +3906,28 @@ function showVSResult(iWon, msg) {
   setTimeout(() => {
     document.getElementById('vs-res-overlay').classList.remove('gone');
   }, 5000);
+}
+
+function setVsSpeed(val) {
+  document.getElementById('vs-speed').value = val;
+  document.querySelectorAll('.vs-speed-opt').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function vsAskHome() {
+  const el = document.getElementById('vs-home-confirm');
+  if (el) el.style.display = 'flex';
+}
+function vsCloseConfirm() {
+  const el = document.getElementById('vs-home-confirm');
+  if (el) el.style.display = 'none';
+}
+function vsConfirmHome() {
+  vsCloseConfirm();
+  cleanupMatch();
+  if (myConn) { try { myConn.close(); } catch(e){} myConn = null; }
+  if (myPeer && !myPeer.destroyed) { myPeer.destroy(); myPeer = null; }
+  switchScreen('screen-home');
 }
 
 function vsRematch() {
@@ -3548,7 +4008,9 @@ const _patchedExecute = async function() {
     document.getElementById('vs-run-btn').textContent='▶️ Çalıştır!';
     document.getElementById('vs-run-btn').className='vs-run-btn';
     vsMyReady=false; vsOppReady=false;
+    vsMyFinished = true;
     sendGame({type:'MY_SEQ', seq:vsMySeq});
+    checkBothFinished();
   }
   vsRunning=false;
 };
